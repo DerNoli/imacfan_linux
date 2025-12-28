@@ -11,7 +11,7 @@ then you need lm-sensors and find the proper fles for the fan:
 type sensors and afterwords check which file corresponds with:
 
 for f in /sys/devices/platform/applesmc.768/temp*_input; do echo -n "$f: "; cat "$f"; done
-
+<details>
 coretemp-isa-0000
 Adapter: ISA adapter
 Package id 0:  +48.0°C  (high = +82.0°C, crit = +100.0°C)
@@ -243,9 +243,8 @@ mclk:         300 MHz
 /sys/devices/platform/applesmc.768/temp98_input: 39000
 /sys/devices/platform/applesmc.768/temp99_input: 39000
 /sys/devices/platform/applesmc.768/temp9_input: 45000
-
 After that set the proper temp file in the script
-
+</details>
 Since my sensor for CPU is TC0p and the GPU Sensor is TG0p i used following lines:
 
 
