@@ -255,10 +255,10 @@ After that set the proper temp file in the script
 Since my sensor for CPU is TC0p and the GPU Sensor is TG0p i used following lines, as these represented the real temps best.
 
 alter the filenames in /usr/local/bin/macfan and macfan-tray.py file:
-
+<details>
 CPU_TEMP="/sys/devices/platform/applesmc.768/temp10_input"
 GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
-
+</details>
 The script can be installed using makpkg -si
 
 it will also sow a tray icon in KDE Plasma 6!
