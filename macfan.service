@@ -1,0 +1,11 @@
+[Unit]
+Description=Mac Fan Controller (Quiet Idle, Full Load)
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/macfan
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
