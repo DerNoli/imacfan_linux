@@ -262,7 +262,11 @@ GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
 Then place the script into /usr/local/bin and make it executable with chmod +x macfan
 Then place the service file into /etc/systemd/system
 
-and finally start the service with sudo systemctl enable --now macfan
+and finally start the service with 
+
+systemctl --user enable --now macfantray.service
+sudo systemctl enable --now macfan
+
 
 See if the script does work by logging:
 journalctl -f -t macfan
