@@ -11,6 +11,7 @@ then you need lm-sensors and find the proper fles for the fan:
 type sensors and afterwords check which file corresponds with:
 
 for f in /sys/devices/platform/applesmc.768/temp*_input; do echo -n "$f: "; cat "$f"; done
+(expand details for an example:
 <details>
 coretemp-isa-0000
 Adapter: ISA adapter
