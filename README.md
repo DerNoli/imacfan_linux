@@ -14,6 +14,8 @@ sudo pacman -S bc stress-ng python-pyqt6
 Check if applesmc-dkms is running by typing:
 sudo lsmod | grep applesmc
 
+also check that applesmc fan mode is set to manual. Look up google for instructions.
+
 I also tried to make a proper packagefile for Arch Linux:
 
 git clone https://github.com/DerNoli/imacfan_linux/tree/imacfan_makepkg_ready.git
