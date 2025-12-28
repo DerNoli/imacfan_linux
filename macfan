@@ -1,0 +1,79 @@
+#!/bin/bash
+export LC_ALL=C
+
+echo 1 > /sys/devices/platform/applesmc.768/fan1_manual
+
+# Temp-Detection files - set according to your system
+
+CPU_TEMP="/sys/devices/platform/applesmc.768/temp10_input"
+GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
+
+# File to set the rpm
+
+FAN_OUTPUT="/sys/devices/platform/applesmc.768/fan1_output"
+
+# Fan curve parameters
+MIN_FAN=1200
+MAX_FAN=5000
+
+# Temperature range for smooth ramp
+MIN_TEMP=40
+MAX_TEMP=76
+
+# GPU weighting (0.0–1.0)
+GPU_WEIGHT=0.6
+CPU_WEIGHT=0.4
+
+# Logarithmic curve aggressiveness
+K=0.12
+
+HYSTERESIS=10
+LAST_FAN=0
+
+logger -t macfan "$(date '+%d.%m.%Y %H:%M:%S') MacFan started with GPU‑weighted logarithmic fan curve."
+
+while true; do
+    RAW_CPU=$(cat "$CPU_TEMP")
+    RAW_GPU=$(cat "$GPU_TEMP")
+
+    CPU=$((RAW_CPU / 1000))
+    GPU=$((RAW_GPU / 1000))
+
+    # Weighted temperature
+    TEMP=$(printf "%.0f" "$(echo "$CPU * $CPU_WEIGHT + $GPU * $GPU_WEIGHT" | bc -l)")
+
+    # Logarithmic fan curve
+    if [ "$TEMP" -le "$MIN_TEMP" ]; then
+        MODE="IDLE"
+        FAN=$MIN_FAN
+
+    elif [ "$TEMP" -ge "$MAX_TEMP" ]; then
+        MODE="LOAD"
+        FAN=$MAX_FAN
+
+    else
+        MODE="LOG"
+        # x = normalized temperature above MIN_TEMP
+        X=$(echo "$TEMP - $MIN_TEMP" | bc -l)
+
+        # scale factor so log curve reaches MAX_FAN at MAX_TEMP
+        RANGE=$(echo "$MAX_TEMP - $MIN_TEMP" | bc -l)
+        SCALE=$(echo "($MAX_FAN - $MIN_FAN) / l(1 + $K * $RANGE)" | bc -l)
+
+        FAN_FLOAT=$(echo "$MIN_FAN + l(1 + $K * $X) * $SCALE" | bc -l)
+        FAN=$(printf "%.0f" "$FAN_FLOAT")
+    fi
+
+    # Log every tick
+    logger -t macfan "$(date '+%d.%m.%Y %H:%M:%S') Temps: CPU=${CPU}°C GPU=${GPU}°C WGT=${TEMP}°C MODE=${MODE} FAN=${FAN}"
+
+    # Hysteresis
+    DIFF=$(( FAN - LAST_FAN ))
+    if [ ${DIFF#-} -gt $HYSTERESIS ]; then
+        echo "$FAN" > "$FAN_OUTPUT"
+        LAST_FAN=$FAN
+        logger -t macfan "$(date '+%d.%m.%Y %H:%M:%S') Fan set to ${FAN} RPM (MODE=${MODE})"
+    fi
+
+    sleep 2
+done
