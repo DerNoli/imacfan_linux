@@ -4,7 +4,7 @@ This script allowed me to control my fan in my iMac19,1 model in Arch linux.
 
 There is some prerequisites to get the script running.
 
-sudo pacman -S bc
+sudo pacman -S bc stress-ng
 
 then you need lm-sensors and find the proper fles for the fan:
 
@@ -256,3 +256,9 @@ Then place the script into /usr/local/bin and make it executable with chmod +x m
 Then place the service file into /et/systemd/system
 
 and finally start the service with sudo systemctl enable --now macfan
+
+See if the script does by logging:
+journalctl -f -t macfan
+
+And to stresstest use 
+stress-ng --cpu 4
