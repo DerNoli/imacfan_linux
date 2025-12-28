@@ -1,0 +1,13 @@
+[Unit]
+Description=Mac Fan Tray Icon
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+ExecStart=/usr/local/bin/macfantray
+Restart=always
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=%h/.Xauthority
+
+[Install]
+WantedBy=default.target

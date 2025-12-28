@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Mac Fan Tray
+Comment=Show CPU/GPU temperature and fan speed
+Exec=macfantray
+Icon=temperature-normal
+Terminal=false
+Categories=Utility;System;
