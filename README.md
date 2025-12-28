@@ -260,6 +260,12 @@ GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
 
 The script can be installed using makpkg -si
 
-it will also sow a tray icon in KDE Plasma 6
+it will also sow a tray icon in KDE Plasma 6!
+
+Ster the services by posting:
+
+sudo systemctl daemon-reload
+systemctl --user daemon-reload
+
 
 stress-ng --cpu 4
