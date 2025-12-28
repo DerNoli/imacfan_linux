@@ -254,7 +254,7 @@ After that set the proper temp file in the script
 </details>
 Since my sensor for CPU is TC0p and the GPU Sensor is TG0p i used following lines, as these represented the real temps best.
 
-
+alter the filenames in /usr/local/bin/macfan and macfantray file
 CPU_TEMP="/sys/devices/platform/applesmc.768/temp10_input"
 GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
 
