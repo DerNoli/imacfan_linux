@@ -10,15 +10,15 @@ Feel free to use and advance it to a better version, but it is highly customizab
 There is some prerequisites to get the script running.
 
 sudo pacman -S bc stress-ng python-pyqt6
+
 Check if applesmc-dkms is running by typing:
+sudo lsmod | grep applesmc
 
 I also tried to make a proper packagefile for Arch Linux:
 
-git clone
-
-
-sudo lsmod | grep applesmc
-
+git clone https://github.com/DerNoli/imacfan_linux/tree/imacfan_makepkg_ready.git
+cd imacfan_makepkg_ready
+makepkg -si
 
 then you need lm-sensors and find the proper fles for the fan:
 
