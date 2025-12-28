@@ -264,8 +264,8 @@ Then place the service file into /etc/systemd/system
 
 and finally start the service with sudo systemctl enable --now macfan
 
-See if the script does by logging:
+See if the script does work by logging:
 journalctl -f -t macfan
 
-And to stresstest use 
+And to stresstest use:(optional but goot to check wether the script funtions find or not)
 stress-ng --cpu 4
