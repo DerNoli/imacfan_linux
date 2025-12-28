@@ -7,13 +7,15 @@ Since i didn't find a daemon for my needs (neither mbpfan nor macfanctld) i trie
 
 Feel free to use and advance it to a better version, but it is highly customizable and also adds a tray in Plasma 6.
 
-I also tried to make a proper packagefile
-
-
 There is some prerequisites to get the script running.
 
 sudo pacman -S bc stress-ng python-pyqt6
 Check if applesmc-dkms is running by typing:
+
+I also tried to make a proper packagefile for Arch Linux:
+
+git clone
+
 
 sudo lsmod | grep applesmc
 
