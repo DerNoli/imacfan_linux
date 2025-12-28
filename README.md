@@ -260,7 +260,7 @@ CPU_TEMP="/sys/devices/platform/applesmc.768/temp10_input"
 GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
 
 Then place the script into /usr/local/bin and make it executable with chmod +x macfan
-Then place the service file into /et/systemd/system
+Then place the service file into /etc/systemd/system
 
 and finally start the service with sudo systemctl enable --now macfan
 
