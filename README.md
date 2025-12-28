@@ -4,8 +4,7 @@ This script allowed me to control my fan in my iMac19,1 model in Arch linux.
 
 There is some prerequisites to get the script running.
 
-sudo pacman -S bc stress-ng
-
+sudo pacman -S bc stress-ng python-pyqt6
 Check if applesmc-dkms is running by typing:
 
 sudo lsmod | grep applesmc
@@ -259,13 +258,8 @@ Since my sensor for CPU is TC0p and the GPU Sensor is TG0p i used following line
 CPU_TEMP="/sys/devices/platform/applesmc.768/temp10_input"
 GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
 
-Then place the script into /usr/local/bin and make it executable with chmod +x macfan
-Then place the service file into /etc/systemd/system
+The script can be installed using makpkg -si
 
-and finally start the service with sudo systemctl enable --now macfan
+it will also sow a tray icon in KDE Plasma 6
 
-See if the script does work by logging:
-journalctl -f -t macfan
-
-And to stresstest use:(optional but goot to check wether the script funtions find or not)
 stress-ng --cpu 4
