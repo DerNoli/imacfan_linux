@@ -6,12 +6,15 @@ There is some prerequisites to get the script running.
 
 sudo pacman -S bc stress-ng
 
+Check if applesmc-dkms is running by typing:
+
+sudo lsmod | grep applesmc
+
+
 then you need lm-sensors and find the proper fles for the fan:
 
-type sensors and afterwords check which file corresponds with:
+type sensors:
 
-for f in /sys/devices/platform/applesmc.768/temp*_input; do echo -n "$f: "; cat "$f"; done
-(expand details for an example:
 <details>
 coretemp-isa-0000
 Adapter: ISA adapter
@@ -142,8 +145,12 @@ edge:         +43.0°C  (crit = +108.0°C, hyst = -273.1°C)
 PPT:           9.11 W  (cap = 103.00 W)
 sclk:         349 MHz 
 mclk:         300 MHz 
+</details>
 
-[martin@archlinux ~]$ for f in /sys/devices/platform/applesmc.768/temp*_input; do echo -n "$f: "; cat "$f"; done
+then find the proper file to change:
+
+for f in /sys/devices/platform/applesmc.768/temp*_input; do echo -n "$f: "; cat "$f"; done
+<details>
 /sys/devices/platform/applesmc.768/temp100_input: 39000
 /sys/devices/platform/applesmc.768/temp10_input: 44750
 /sys/devices/platform/applesmc.768/temp11_input: 48000
@@ -246,7 +253,7 @@ mclk:         300 MHz
 /sys/devices/platform/applesmc.768/temp9_input: 45000
 After that set the proper temp file in the script
 </details>
-Since my sensor for CPU is TC0p and the GPU Sensor is TG0p i used following lines:
+Since my sensor for CPU is TC0p and the GPU Sensor is TG0p i used following lines, as these represented the real temps best.
 
 
 CPU_TEMP="/sys/devices/platform/applesmc.768/temp10_input"
