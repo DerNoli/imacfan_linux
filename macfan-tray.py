@@ -7,9 +7,9 @@ from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QTimer
 
-CPU_SENSOR = "/sys/devices/platform/applesmc.768/temp14_input"
-GPU_SENSOR = "/sys/devices/platform/applesmc.768/temp23_input"
-FAN_SENSOR = "/sys/devices/platform/applesmc.768/fan1_input"
+CPU_SENSOR = "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/temp10_input"
+GPU_SENSOR = "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/temp23_input"
+FAN_SENSOR = "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/fan1_input"
 
 def read_int(path):
     try:
