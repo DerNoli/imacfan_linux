@@ -18,3 +18,7 @@ cd imacfan_linux
 When you are in the directory, type:
 
 makepkg -si
+
+enable the service with:
+
+sudo systemctl enable --now macfan
