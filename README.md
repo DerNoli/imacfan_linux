@@ -11,8 +11,10 @@ clone the git:
 
 git clone https://github.com/DerNoli/imacfan_linux
 
-then
+then change into the directory by typing:
 
 cd imacfan_linux
+
+When you are in the directory, type:
 
 makepkg -si
