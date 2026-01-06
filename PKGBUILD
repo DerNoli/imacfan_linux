@@ -1,4 +1,4 @@
-# Maintainer: Your Name <you@example.com>
+# Maintainer: DerNoli
 
 pkgname=imacfancontrol
 pkgver=1.1
