@@ -1,6 +1,6 @@
 # Maintainer: DerNoli
 
-pkgname=imacfancontrol
+pkgname=imac_fancontrol
 pkgver=1.1
 pkgrel=1
 pkgdesc="Mac Fan Tray + Fan Daemon for Linux"
