@@ -1,3 +1,5 @@
+# Maintainer: Your Name <you@example.com>
+
 pkgname=imacfancontrol
 pkgver=1.1
 pkgrel=1
@@ -19,11 +21,11 @@ package() {
 
     # Install system-level fan script
     install -Dm755 "$srcdir/macfan" \
-        "$pkgdir/usr/local/bin/macfan"
+        "$pkgdir/usr/bin/macfan"
 
     # Install tray Python application (renamed to executable)
     install -Dm755 "$srcdir/macfan-tray.py" \
-        "$pkgdir/usr/local/bin/macfantray"
+        "$pkgdir/usr/bin/macfantray"
 
     # Install desktop launcher
     install -Dm644 "$srcdir/macfantray.desktop" \
@@ -31,7 +33,7 @@ package() {
 
     # Install systemd system service (fan daemon)
     install -Dm644 "$srcdir/macfan.service" \
-        "$pkgdir/etc/systemd/system/macfan.service"
+        "$pkgdir/usr/lib/systemd/system/macfan.service"
 
     # Install systemd user service (tray icon)
     install -Dm644 "$srcdir/macfantray.service" \
@@ -39,14 +41,20 @@ package() {
 }
 
 post_install() {
-    echo "Enabling macfan.service (system daemon)..."
-    systemctl enable macfan.service >/dev/null 2>&1 || true
-
-    echo "Enabling macfantray.service for the current user..."
-    systemctl --user enable macfantray.service >/dev/null 2>&1 || true
+    echo "Systemd units installed."
+    echo "To enable services:"
+    echo "  sudo systemctl enable --now macfan.service"
+    echo "  systemctl --user enable --now macfantray.service"
 }
 
 post_upgrade() {
+    echo "Reloading systemd units..."
     systemctl daemon-reload >/dev/null 2>&1 || true
     systemctl --user daemon-reload >/dev/null 2>&1 || true
+}
+
+post_remove() {
+    echo "Removing systemd units..."
+    systemctl disable --now macfan.service >/dev/null 2>&1 || true
+    systemctl --user disable --now macfantray.service >/dev/null 2>&1 || true
 }
