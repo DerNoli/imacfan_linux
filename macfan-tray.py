@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 # Save this file as: macfantray
 # Then run: chmod +x macfantray
 
