@@ -1,5 +1,5 @@
 pkgname=imacfancontrol
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc="Mac Fan Tray + Fan Daemon for Linux"
 arch=('any')
