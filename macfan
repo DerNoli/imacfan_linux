@@ -1,16 +1,16 @@
 #!/bin/bash
 export LC_ALL=C
 
-echo 1 > /sys/devices/platform/applesmc.768/fan1_manual
+echo 1 > /sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/fan1_manual
 
 # Temp-Detection files - set according to your system
 
-CPU_TEMP="/sys/devices/platform/applesmc.768/temp10_input"
-GPU_TEMP="/sys/devices/platform/applesmc.768/temp23_input"
+CPU_TEMP="/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/temp10_input"
+GPU_TEMP="/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/temp23_input"
 
 # File to set the rpm
 
-FAN_OUTPUT="/sys/devices/platform/applesmc.768/fan1_output"
+FAN_OUTPUT="/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/fan1_output"
 
 # Fan curve parameters
 MIN_FAN=1200
