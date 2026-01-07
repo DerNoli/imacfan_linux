@@ -7,7 +7,7 @@ pkgdesc="Mac Fan Tray + Fan Daemon for Linux"
 arch=('any')
 url="https://example.com"
 license=('MIT')
-depends=('python' 'python-pyqt6' 'bc' 'lm_sensors')
+depends=('python' 'python-pyqt6' 'bc' 'lm_sensors' 'breeze-icons')
 source=(
     'macfan'
     'macfan.service'
