@@ -1,0 +1,21 @@
+post_install() {
+    echo ">>> imac_fancontrol installation complete."
+    echo ">>> To enable and start the fan daemon (system-wide):"
+    echo "    sudo systemctl enable --now macfan.service"
+    echo ">>>"
+    echo ">>> To enable and start the tray icon (per-user):"
+    echo "    systemctl --user enable --now macfantray.service"
+}
+
+post_upgrade() {
+    echo ">>> imac_fancontrol has been updated."
+    echo ">>> It is recommended to restart the services:"
+    echo "    sudo systemctl restart macfan.service"
+    echo "    systemctl --user restart macfantray.service"
+}
+
+pre_remove() {
+    echo ">>> Disabling and stopping systemd units..."
+    systemctl disable --now macfan.service >/dev/null 2>&1 || true
+    systemctl --user --global disable --now macfantray.service >/dev/null 2>&1 || true
+}
