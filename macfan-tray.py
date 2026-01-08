@@ -2,6 +2,8 @@
 # Save as: macfantray
 # chmod +x macfantray
 
+# Maintainer DerNoli
+
 import sys
 import os
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
