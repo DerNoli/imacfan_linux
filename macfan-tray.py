@@ -4,35 +4,31 @@
 
 import sys
 import os
+import subprocess
+import configparser
+import xml.etree.ElementTree as ET
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QTimer
-from gi.repository import Gio
-import configparser
-import xml.etree.ElementTree as ET
 
+# Sensor Paths
 CPU_SENSOR = "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/temp10_input"
 GPU_SENSOR = "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/temp23_input"
 FAN_SENSOR = "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00/fan1_input"
 
 def read_int(path):
     try:
-        return int(open(path).read().strip())
+        with open(path, 'r') as f:
+            return int(f.read().strip())
     except:
         return 0
 
 # ---------------------------------------------------------
-# UNIVERSAL THEME DETECTION (SAFE VERSION)
+# UNIVERSAL THEME DETECTION (CLI VERSION - PREVENTS BLOCKING)
 # ---------------------------------------------------------
 
 class ThemeDetector:
     def __init__(self):
-        # Create GSettings objects ONCE
-        try:
-            self.gnome_settings = Gio.Settings.new("org.gnome.desktop.interface")
-        except:
-            self.gnome_settings = None
-
         self.cached_dark = False
         self.update_theme()
 
@@ -41,38 +37,39 @@ class ThemeDetector:
         self.timer.timeout.connect(self.update_theme)
         self.timer.start(60000)
 
-    def detect_gnome_dark(self):
-        if not self.gnome_settings:
-            return None
+    def _get_gsettings(self, schema, key):
+        """Helper to get gsettings without holding a Gio lock."""
         try:
-            scheme = self.gnome_settings.get_string("color-scheme")
-            return scheme == "prefer-dark"
+            cmd = ["gsettings", "get", schema, key]
+            return subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip().strip("'")
         except:
             return None
+
+    def detect_gnome_dark(self):
+        scheme = self._get_gsettings("org.gnome.desktop.interface", "color-scheme")
+        if scheme:
+            return scheme == "prefer-dark"
+        return None
 
     def detect_cinnamon_dark(self):
-        try:
-            settings = Gio.Settings.new("org.cinnamon.desktop.interface")
-            theme = settings.get_string("gtk-theme").lower()
-            return "dark" in theme
-        except:
-            return None
+        theme = self._get_gsettings("org.cinnamon.desktop.interface", "gtk-theme")
+        if theme:
+            return "dark" in theme.lower()
+        return None
 
     def detect_mate_dark(self):
-        try:
-            settings = Gio.Settings.new("org.mate.interface")
-            theme = settings.get_string("gtk-theme").lower()
-            return "dark" in theme
-        except:
-            return None
+        theme = self._get_gsettings("org.mate.interface", "gtk-theme")
+        if theme:
+            return "dark" in theme.lower()
+        return None
 
     def detect_kde_dark(self):
         path = os.path.expanduser("~/.config/kdeglobals")
         if not os.path.exists(path):
             return None
         cfg = configparser.ConfigParser()
-        cfg.read(path)
         try:
+            cfg.read(path)
             scheme = cfg["General"]["ColorScheme"].lower()
             return "dark" in scheme
         except:
@@ -98,8 +95,8 @@ class ThemeDetector:
         if not os.path.exists(path):
             return None
         cfg = configparser.ConfigParser()
-        cfg.read(path)
         try:
+            cfg.read(path)
             theme = cfg["General"]["theme"].lower()
             return "dark" in theme
         except:
@@ -127,7 +124,6 @@ class ThemeDetector:
             if result is not None:
                 self.cached_dark = result
                 return
-
         self.cached_dark = False  # fallback
 
     def is_dark(self):
@@ -141,7 +137,6 @@ class ThemeDetector:
 class MacFanTray:
     def __init__(self):
         self.app = QApplication(sys.argv)
-
         self.theme = ThemeDetector()
 
         self.menu = QMenu()
@@ -167,12 +162,14 @@ class MacFanTray:
 
     def themed_icon(self, cold, normal, hot, weighted):
         dark = self.theme.is_dark()
+        mode_key = "dark" if dark else "light"
+        
         if weighted < 45:
-            return QIcon(cold["dark" if dark else "light"])
+            return QIcon(cold[mode_key])
         elif weighted < 70:
-            return QIcon(normal["dark" if dark else "light"])
+            return QIcon(normal[mode_key])
         else:
-            return QIcon(hot["dark" if dark else "light"])
+            return QIcon(hot[mode_key])
 
     def update(self):
         cpu = read_int(CPU_SENSOR) // 1000
@@ -180,6 +177,7 @@ class MacFanTray:
         fan = read_int(FAN_SENSOR)
         weighted = int(cpu * 0.4 + gpu * 0.6)
 
+        # Breeze icon paths
         cold_icons = {
             "light": "/usr/share/icons/breeze/status/22/temperature-cold.svg",
             "dark": "/usr/share/icons/breeze-dark/status/22/temperature-cold.svg"
@@ -203,7 +201,6 @@ class MacFanTray:
 
     def run(self):
         sys.exit(self.app.exec())
-
 
 if __name__ == "__main__":
     MacFanTray().run()
