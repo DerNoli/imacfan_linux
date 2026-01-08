@@ -2,8 +2,6 @@
 # Save as: macfantray
 # chmod +x macfantray
 
-# Maintainer DerNoli
-
 import sys
 import os
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
@@ -24,95 +22,117 @@ def read_int(path):
         return 0
 
 # ---------------------------------------------------------
-# UNIVERSAL THEME DETECTION
+# UNIVERSAL THEME DETECTION (SAFE VERSION)
 # ---------------------------------------------------------
 
-def detect_gnome_dark():
-    try:
-        settings = Gio.Settings.new("org.gnome.desktop.interface")
-        scheme = settings.get_string("color-scheme")
-        return scheme == "prefer-dark"
-    except:
+class ThemeDetector:
+    def __init__(self):
+        # Create GSettings objects ONCE
+        try:
+            self.gnome_settings = Gio.Settings.new("org.gnome.desktop.interface")
+        except:
+            self.gnome_settings = None
+
+        self.cached_dark = False
+        self.update_theme()
+
+        # Re-check theme every 60 seconds
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_theme)
+        self.timer.start(60000)
+
+    def detect_gnome_dark(self):
+        if not self.gnome_settings:
+            return None
+        try:
+            scheme = self.gnome_settings.get_string("color-scheme")
+            return scheme == "prefer-dark"
+        except:
+            return None
+
+    def detect_cinnamon_dark(self):
+        try:
+            settings = Gio.Settings.new("org.cinnamon.desktop.interface")
+            theme = settings.get_string("gtk-theme").lower()
+            return "dark" in theme
+        except:
+            return None
+
+    def detect_mate_dark(self):
+        try:
+            settings = Gio.Settings.new("org.mate.interface")
+            theme = settings.get_string("gtk-theme").lower()
+            return "dark" in theme
+        except:
+            return None
+
+    def detect_kde_dark(self):
+        path = os.path.expanduser("~/.config/kdeglobals")
+        if not os.path.exists(path):
+            return None
+        cfg = configparser.ConfigParser()
+        cfg.read(path)
+        try:
+            scheme = cfg["General"]["ColorScheme"].lower()
+            return "dark" in scheme
+        except:
+            return None
+
+    def detect_xfce_dark(self):
+        path = os.path.expanduser("~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml")
+        if not os.path.exists(path):
+            return None
+        try:
+            tree = ET.parse(path)
+            root = tree.getroot()
+            for prop in root.findall("property"):
+                if prop.get("name") == "ThemeName":
+                    theme = prop.get("value", "").lower()
+                    return "dark" in theme
+        except:
+            pass
         return None
 
-def detect_cinnamon_dark():
-    try:
-        settings = Gio.Settings.new("org.cinnamon.desktop.interface")
-        theme = settings.get_string("gtk-theme").lower()
-        return "dark" in theme
-    except:
+    def detect_lxqt_dark(self):
+        path = os.path.expanduser("~/.config/lxqt/session.conf")
+        if not os.path.exists(path):
+            return None
+        cfg = configparser.ConfigParser()
+        cfg.read(path)
+        try:
+            theme = cfg["General"]["theme"].lower()
+            return "dark" in theme
+        except:
+            return None
+
+    def detect_env_dark(self):
+        for var in ["GTK_THEME", "QT_QPA_PLATFORMTHEME"]:
+            if var in os.environ:
+                if "dark" in os.environ[var].lower():
+                    return True
         return None
 
-def detect_mate_dark():
-    try:
-        settings = Gio.Settings.new("org.mate.interface")
-        theme = settings.get_string("gtk-theme").lower()
-        return "dark" in theme
-    except:
-        return None
+    def update_theme(self):
+        detectors = [
+            self.detect_gnome_dark,
+            self.detect_cinnamon_dark,
+            self.detect_mate_dark,
+            self.detect_kde_dark,
+            self.detect_xfce_dark,
+            self.detect_lxqt_dark,
+            self.detect_env_dark,
+        ]
+        for fn in detectors:
+            result = fn()
+            if result is not None:
+                self.cached_dark = result
+                return
 
-def detect_kde_dark():
-    path = os.path.expanduser("~/.config/kdeglobals")
-    if not os.path.exists(path):
-        return None
-    cfg = configparser.ConfigParser()
-    cfg.read(path)
-    try:
-        scheme = cfg["General"]["ColorScheme"].lower()
-        return "dark" in scheme
-    except:
-        return None
+        self.cached_dark = False  # fallback
 
-def detect_xfce_dark():
-    path = os.path.expanduser("~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml")
-    if not os.path.exists(path):
-        return None
-    try:
-        tree = ET.parse(path)
-        root = tree.getroot()
-        for prop in root.findall("property"):
-            if prop.get("name") == "ThemeName":
-                theme = prop.get("value", "").lower()
-                return "dark" in theme
-    except:
-        pass
-    return None
+    def is_dark(self):
+        return self.cached_dark
 
-def detect_lxqt_dark():
-    path = os.path.expanduser("~/.config/lxqt/session.conf")
-    if not os.path.exists(path):
-        return None
-    cfg = configparser.ConfigParser()
-    cfg.read(path)
-    try:
-        theme = cfg["General"]["theme"].lower()
-        return "dark" in theme
-    except:
-        return None
-
-def detect_env_dark():
-    for var in ["GTK_THEME", "QT_QPA_PLATFORMTHEME"]:
-        if var in os.environ:
-            if "dark" in os.environ[var].lower():
-                return True
-    return None
-
-def is_dark_theme():
-    """Universal theme detection across all major desktop environments."""
-    detectors = [
-        detect_gnome_dark,
-        detect_cinnamon_dark,
-        detect_mate_dark,
-        detect_kde_dark,
-        detect_xfce_dark,
-        detect_lxqt_dark,
-        detect_env_dark,
-    ]
-    for fn in detectors:
-        result = fn()
-        if result is not None:
-            return result
-    return False  # fallback: assume light theme
 
 # ---------------------------------------------------------
 # MAIN APP
@@ -121,6 +141,8 @@ def is_dark_theme():
 class MacFanTray:
     def __init__(self):
         self.app = QApplication(sys.argv)
+
+        self.theme = ThemeDetector()
 
         self.menu = QMenu()
         self.info_action = self.menu.addAction("Loading…")
@@ -144,7 +166,7 @@ class MacFanTray:
         self.update()
 
     def themed_icon(self, cold, normal, hot, weighted):
-        dark = is_dark_theme()
+        dark = self.theme.is_dark()
         if weighted < 45:
             return QIcon(cold["dark" if dark else "light"])
         elif weighted < 70:
@@ -181,6 +203,7 @@ class MacFanTray:
 
     def run(self):
         sys.exit(self.app.exec())
+
 
 if __name__ == "__main__":
     MacFanTray().run()
