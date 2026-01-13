@@ -14,7 +14,7 @@ FAN_OUTPUT="/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:5e/APP0001:00
 
 # Fan curve parameters
 MIN_FAN=1200
-MAX_FAN=5000
+MAX_FAN=2700
 
 # Temperature range for smooth ramp
 MIN_TEMP=40
