@@ -1,0 +1,16 @@
+  GNU nano 8.5                           /home/martink/.config/systemd/user/macfantray.service                                      
+[Unit]
+Description=Mac Fan Tray Icon
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/bin/macfantray
+Restart=no
+
+# Do NOT hardcode DISPLAY or use EnvironmentFile
+# macfantray will inherit the correct environment once the session is ready
+
+[Install]
+WantedBy=graphical-session.target
